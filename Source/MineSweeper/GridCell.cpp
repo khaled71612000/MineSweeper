@@ -40,13 +40,8 @@ void AGridCell::BeginPlay()
 void AGridCell::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	StaticMeshComponent->SetVisibility(!bIsRevealed);
 }
 
-//void AGridCell::Initialize(int32 InI, int32 InJ, float InW)
-//{
-//
-//}
 
 void AGridCell::Reveal()
 {
@@ -60,13 +55,49 @@ void AGridCell::Reveal()
 		MineText->SetText(FText::FromString(FString::FromInt(NeighborCount)));
 		//StaticMeshComponent
 	}
+
 	bIsRevealed = true;
+
+	StaticMeshComponent->SetVisibility(!bIsRevealed);
+
+
+	if (NeighborCount == 0)
+	{
+		FloodFill();
+	}
 }
 
-int32 AGridCell::CountBombs(TArray<TArray<AGridCell*>>& Grid)
+void AGridCell::FloodFill()
+{
+	for (int32 i = -1; i <= 1; i++)
+	{
+		for (int32 j = -1; j <= 1; j++)
+		{
+			int32 NeighborRow = I + i;
+			int32 NeighborCol = J + j;
+
+			// Check if the neighbor indices are within the bounds of the grid
+			if (NeighborRow >= 0 && NeighborRow < GridArray.Num() &&
+				NeighborCol >= 0 && NeighborCol < GridArray[NeighborRow].Num())
+			{
+				if (AGridCell* Neigh = GridArray[NeighborRow][NeighborCol])
+				{
+					if (!Neigh->bIsBomb && !Neigh->bIsRevealed)
+					{
+						Neigh->Reveal();
+					}
+				}
+			}
+		}
+	}
+}
+
+
+int32 AGridCell::CountBombs()
 {
 	if (bIsBomb)
 	{
+		NeighborCount = -1;
 		return -1;
 	}
 
@@ -80,10 +111,10 @@ int32 AGridCell::CountBombs(TArray<TArray<AGridCell*>>& Grid)
 			int32 NeighborCol = J + j;
 
 			// Check if the neighbor indices are within the bounds of the grid
-			if (NeighborRow >= 0 && NeighborRow < Grid.Num() &&
-				NeighborCol >= 0 && NeighborCol < Grid[NeighborRow].Num())
+			if (NeighborRow >= 0 && NeighborRow < GridArray.Num() &&
+				NeighborCol >= 0 && NeighborCol < GridArray[NeighborRow].Num())
 			{
-				if (AGridCell* Neigh = Grid[NeighborRow][NeighborCol])
+				if (AGridCell* Neigh = GridArray[NeighborRow][NeighborCol])
 				{
 					if (Neigh->bIsBomb)
 					{
@@ -95,6 +126,16 @@ int32 AGridCell::CountBombs(TArray<TArray<AGridCell*>>& Grid)
 	}
 
 	NeighborCount = total;
+
+
+	if (NeighborCount <= 0)
+	{
+		MineText->SetVisibility(false);
+	}
+	else
+	{
+		MineText->SetVisibility(true);
+	}
 
 	return total;
 }

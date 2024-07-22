@@ -24,8 +24,6 @@ void AMinesweeperGrid::BeginPlay()
 void AMinesweeperGrid::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
 
 void AMinesweeperGrid::LineTraceRevealCell(const FVector& Start, const FVector& End)
@@ -41,7 +39,14 @@ void AMinesweeperGrid::LineTraceRevealCell(const FVector& Start, const FVector& 
 		AGridCell* HitCell = Cast<AGridCell>(HitResult.GetActor());
 		if (HitCell)
 		{
-			HitCell->Reveal();
+			if (!HitCell->bIsBomb)
+			{
+				HitCell->Reveal();
+			}
+			else
+			{
+				GameOver();
+			}
 		}
 	}
 
@@ -69,6 +74,13 @@ void AMinesweeperGrid::InitializeGrid()
 		}
 	}
 
+	// Shuffle the list of all cell locations
+	for (int32 i = GridArray.Num() - 1; i > 0; i--)
+	{
+		int32 j = FMath::RandRange(0, i);
+		GridArray.Swap(i, j);
+	}
+
 	for (int32 n = 0; n < TotalBombs; n++)
 	{
 		int32 Index = FMath::RandRange(0, options.Num() - 1);
@@ -90,7 +102,7 @@ void AMinesweeperGrid::InitializeGrid()
 	{
 		for (int32 j = 0; j < Rows; j++)
 		{
-			GridArray[i][j]->CountBombs(GridArray);
+			GridArray[i][j]->CountBombs();
 		}
 	}
 
@@ -102,7 +114,7 @@ void AMinesweeperGrid::GameOver()
 	{
 		for (int32 j = 0; j < Rows; j++)
 		{
-			GridArray[i][j]->bIsRevealed = true;
+			GridArray[i][j]->Reveal();
 		}
 	}
 }
@@ -115,4 +127,5 @@ void AMinesweeperGrid::CreateCell(int32 Row, int32 Column)
 	GridArray[Row][Column] = (NewCell);
 	NewCell->I = Row;
 	NewCell->J = Column;
+	NewCell->GridArray = GridArray;
 }

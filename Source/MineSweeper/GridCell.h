@@ -32,7 +32,8 @@ public:
 
 	//void Initialize(int32 InI, int32 InJ, float InW);
 	void Reveal();
-	int32 CountBombs(TArray<TArray<AGridCell*>>& Grid);
+	void FloodFill();
+	int32 CountBombs();
 
 	//bool Contains(float X, float Y) const;
 	//void Show();
@@ -42,6 +43,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
 	int32 J;
+
+	TArray<TArray<AGridCell*>> GridArray;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
 	//float X;
