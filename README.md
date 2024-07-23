@@ -76,9 +76,9 @@ The `AGridCell` class represents individual cells in the Minesweeper grid, handl
 4. **Game Logic**: Implement game state management, including win/lose conditions.
 5. **Visual Feedback**: Add visual effects for cell states (hovered, revealed, bomb).
 
-## Credits
+[YouTube Video](https://youtu.be/ynAtPrD0j-Q?si=kyZxBkhO9IEaxJkX)
 
-This project is developed by Khaled Elsayed Zakaria.
+![GIF 3](https://media.giphy.com/media/R37eeyW8phT9dA05Mr/giphy.gif)
 
 ![image](https://github.com/user-attachments/assets/95a4f8dc-d422-46e5-8883-2e280fbc1d74)
 ![image](https://github.com/user-attachments/assets/38abc8e5-7f31-4f29-b86d-525df52d94fe)
