@@ -33,9 +33,6 @@ public:
 	TSubclassOf<class AGridCell> Cell;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
-	UStaticMesh* BombMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	int32 TotalBombs;
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")

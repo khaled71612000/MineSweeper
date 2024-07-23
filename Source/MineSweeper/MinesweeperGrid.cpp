@@ -51,7 +51,7 @@ void AMinesweeperGrid::LineTraceRevealCell(const FVector& Start, const FVector& 
 	}
 
 	// Optional: Draw debug line
-	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 1.0f);
+	//DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 1.0f);
 }
 void AMinesweeperGrid::InitializeGrid()
 {
@@ -66,19 +66,12 @@ void AMinesweeperGrid::InitializeGrid()
 	}
 
 	TArray<FIntPoint> options;
-	for (int32 i = 0; i < Columns; i++)
+	for (int32 i = 0; i < Rows; i++)
 	{
-		for (int32 j = 0; j < Rows; j++)
+		for (int32 j = 0; j < Columns; j++)
 		{
 			options.Add(FIntPoint(i, j));
 		}
-	}
-
-	// Shuffle the list of all cell locations
-	for (int32 i = GridArray.Num() - 1; i > 0; i--)
-	{
-		int32 j = FMath::RandRange(0, i);
-		GridArray.Swap(i, j);
 	}
 
 	for (int32 n = 0; n < TotalBombs; n++)
@@ -89,30 +82,23 @@ void AMinesweeperGrid::InitializeGrid()
 		int32 j = Choice.Y;
 		options.RemoveAt(Index);
 		GridArray[i][j]->bIsBomb = true;
-		//GridArray[i][j]->MineMesh->SetStaticMesh(BombMesh);
-		//GridArray[i][j]->MineText->SetVisibility(false);
-
-		//FVector bombLocation = GridArray[i][j]->GetActorLocation();
-		//bombLocation.Z -= 100;
-		//AGridCell* NewCell = GetWorld()->SpawnActor<AGridCell>(Bomb, bombLocation, FRotator::ZeroRotator);
-
 	}
 
-	for (int32 i = 0; i < Columns; i++)
+	for (int32 i = 0; i < Rows; i++)
 	{
-		for (int32 j = 0; j < Rows; j++)
+		for (int32 j = 0; j < Columns; j++)
 		{
+			GridArray[i][j]->GridArray = GridArray;
 			GridArray[i][j]->CountBombs();
 		}
 	}
-
 }
 
 void AMinesweeperGrid::GameOver()
 {
-	for (int32 i = 0; i < Columns; i++)
+	for (int32 i = 0; i < Rows; i++)
 	{
-		for (int32 j = 0; j < Rows; j++)
+		for (int32 j = 0; j < Columns; j++)
 		{
 			GridArray[i][j]->Reveal();
 		}
@@ -127,5 +113,4 @@ void AMinesweeperGrid::CreateCell(int32 Row, int32 Column)
 	GridArray[Row][Column] = (NewCell);
 	NewCell->I = Row;
 	NewCell->J = Column;
-	NewCell->GridArray = GridArray;
 }

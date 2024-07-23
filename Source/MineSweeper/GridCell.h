@@ -24,19 +24,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
 	class UStaticMeshComponent* StaticMeshComponent;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
-	//class UStaticMeshComponent* MineMesh;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
 	class UTextRenderComponent* MineText;
 
-	//void Initialize(int32 InI, int32 InJ, float InW);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
+	UMaterialInterface* RevealedCell;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
+	UMaterialInterface* HoveredCell;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
+	UMaterialInterface* DefaultCell;
+
+	UFUNCTION()
+	void OnHoverStart();
+
+	UFUNCTION()
+	void OnHoverEnd();
+
 	void Reveal();
 	void FloodFill();
 	int32 CountBombs();
-
-	//bool Contains(float X, float Y) const;
-	//void Show();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
 	int32 I;
@@ -45,15 +53,6 @@ public:
 	int32 J;
 
 	TArray<TArray<AGridCell*>> GridArray;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
-	//float X;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
-	//float Y;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
-	//float W;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cell")
 	int32 NeighborCount;

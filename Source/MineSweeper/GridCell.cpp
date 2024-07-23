@@ -12,18 +12,12 @@ AGridCell::AGridCell()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CellMesh"));
 	RootComponent = StaticMeshComponent;
 
-	//MineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("UnderMesh"));
-	//MineMesh->SetupAttachment(RootComponent);
-	//MineMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -30.0f));
-	//MineMesh->SetRelativeRotation(FRotator(90.f, 180.f, 0.f));
-	//MineMesh->SetWorldScale3D(FVector(.6f));
-
 	MineText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("MineText"));
 	MineText->SetupAttachment(RootComponent);
-	MineText->SetRelativeLocation(FVector(-60.f, -30.0f, -10.0f));
+	MineText->SetRelativeLocation(FVector(-60.f, -30.0f, -5.0f));
 	MineText->SetRelativeRotation(FRotator(90.f, 180.f, 0.f));
-	MineText->SetXScale(3.0f);
-	MineText->SetYScale(3.0f);
+	MineText->SetXScale(5.0f);
+	MineText->SetYScale(5.0f);
 	MineText->SetText(FText::FromString("0"));
 
 	bIsRevealed = false;
@@ -43,29 +37,67 @@ void AGridCell::Tick(float DeltaTime)
 }
 
 
+void AGridCell::OnHoverStart()
+{
+	FVector NewLocation = GetActorLocation();
+	NewLocation.Z += 50.0f; // Elevate by 20 units
+	StaticMeshComponent->SetMaterial(0, HoveredCell);
+	SetActorLocation(NewLocation);
+}
+
+void AGridCell::OnHoverEnd()
+{
+	FVector NewLocation = GetActorLocation();
+	NewLocation.Z -= 50.0f; // Return to original position
+	StaticMeshComponent->SetMaterial(0, DefaultCell);
+	SetActorLocation(NewLocation);
+}
+
 void AGridCell::Reveal()
 {
+	if (bIsRevealed) return; // Prevent revealing already revealed cells
+
+	bIsRevealed = true;
+
 	if (bIsBomb)
 	{
-		MineText->SetText(FText::FromString("xx"));
-		//StaticMeshComponent
+		MineText->SetText(FText::FromString("B"));
+		MineText->SetTextRenderColor(FColor::Orange);
 	}
 	else
 	{
 		MineText->SetText(FText::FromString(FString::FromInt(NeighborCount)));
-		//StaticMeshComponent
+		switch (NeighborCount)
+		{
+		case 1:
+			MineText->SetTextRenderColor(FColor::White);
+			break;
+		case 2:
+			MineText->SetTextRenderColor(FColor::Green);
+			break;
+		case 3:
+			MineText->SetTextRenderColor(FColor::Red);
+			break;
+		case 4:
+			MineText->SetTextRenderColor(FColor::Blue);
+			break;
+		case 5:
+			MineText->SetTextRenderColor(FColor::Magenta);
+			break;
+		default:
+			MineText->SetTextRenderColor(FColor::Turquoise);
+			break;
+		}
 	}
-
-	bIsRevealed = true;
-
-	StaticMeshComponent->SetVisibility(!bIsRevealed);
-
 
 	if (NeighborCount == 0)
 	{
 		FloodFill();
 	}
+
+	StaticMeshComponent->SetVisibility(!true);
 }
+
 
 void AGridCell::FloodFill()
 {
@@ -76,16 +108,13 @@ void AGridCell::FloodFill()
 			int32 NeighborRow = I + i;
 			int32 NeighborCol = J + j;
 
-			// Check if the neighbor indices are within the bounds of the grid
 			if (NeighborRow >= 0 && NeighborRow < GridArray.Num() &&
 				NeighborCol >= 0 && NeighborCol < GridArray[NeighborRow].Num())
 			{
-				if (AGridCell* Neigh = GridArray[NeighborRow][NeighborCol])
+				AGridCell* Neighbor = GridArray[NeighborRow][NeighborCol];
+				if (Neighbor && !Neighbor->bIsRevealed)
 				{
-					if (!Neigh->bIsBomb && !Neigh->bIsRevealed)
-					{
-						Neigh->Reveal();
-					}
+					Neighbor->Reveal();
 				}
 			}
 		}
@@ -107,6 +136,7 @@ int32 AGridCell::CountBombs()
 	{
 		for (int32 j = -1; j <= 1; j++)
 		{
+
 			int32 NeighborRow = I + i;
 			int32 NeighborCol = J + j;
 
@@ -127,25 +157,9 @@ int32 AGridCell::CountBombs()
 
 	NeighborCount = total;
 
-
-	if (NeighborCount <= 0)
-	{
-		MineText->SetVisibility(false);
-	}
-	else
-	{
-		MineText->SetVisibility(true);
-	}
+	// Update the visibility of the mine text
+	MineText->SetText(FText::FromString(FString::FromInt(NeighborCount)));
+	MineText->SetVisibility(NeighborCount > 0);
 
 	return total;
 }
-
-//bool AGridCell::Contains(float X, float Y) const
-//{
-//	return false;
-//}
-//
-//void AGridCell::Show()
-//{
-//
-//}
